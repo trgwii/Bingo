@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Bingo.js generator</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+	</head>
+	<body>
+		<div id="controls" class="d-print-none">
+			<h1>Bingo.js generator</h1>
+			<label for="boards">How many boards do you want to generate?</label>
+			<input id="boards" type="number" min="0" max="99" placeholder="Boards" value="1" />
+			<br />
+			<label for="rows">How many rows per board?</label>
+			<input id="rows" type="number" min="0" max="99" placeholder="Rows" value="5" />
+			<br />
+			<label for="columns">How many columns per board?</label>
+			<input id="columns" type="number" min="0" max="99" placeholder="Columns" value="5" />
+			<br />
+			<label for="minNumber">Numbers from</label>
+			<input id="minNumber" type="number" min="0" max="10000" value="1" />
+			<label for="maxNumber">to</label>
+			<input id="maxNumber" type="number" min="0" max="100000" value="50" />
+			<br />
+			<details>
+				<summary>Advanced settings</summary>
+				<label for="header">Use header?</label>
+				<input id="header" type="checkbox" checked="checked" />
+				<br />
+				<label for="headerText">Header text</label>
+				<input id="headerText" type="text" value="BINGO" />
+				<br />
+				<label for="headerColor">Background color of header</label>
+				<input id="headerColor" type="color" value="#FFFFFF" />
+				<br />
+				<label for="centered">Center text?</label>
+				<input id="centered" type="checkbox" checked="checked" />
+				<br />
+				<label for="width">Width of each cell?</label>
+				<input id="width" type="number" min="0" max="500" />
+				<br />
+				<label for="height">Height of each cell?</label>
+				<input id="height" type="number" min="0" max="500" />
+				<br />
+				<label for="fontSize">Font size of each cell?</label>
+				<input id="fontSize" type="number" min="0" max="500" />
+				<br />
+			</details>
+		</div>
+		<div id="result"></div>
+		<script type="application/javascript">
+			const clamp = el =>
+				el.min && el.max
+					? el.value =
+						Number(el.value) < Number(el.min) ? Number(el.min) :
+						Number(el.value) > Number(el.max) ? Number(el.max) :
+						Number(el.value)
+					: el.value;
+			const values = inputs =>
+				Object.entries(inputs)
+					.reduce((acc, [ key, el ]) =>
+						({ ...acc, [key]: clamp(el) }), {});
+
+			const inputs = {
+				boards,
+				rows,
+				columns,
+				minNumber,
+				maxNumber,
+				header,
+				headerText,
+				headerColor,
+				centered,
+				width,
+				height,
+				fontSize
+			};
+
+			Object.values(inputs).forEach(el =>
+				el.addEventListener('input', e => {
+					const {
+						boards,
+						rows,
+						columns,
+						minNumber,
+						maxNumber,
+						headerText,
+						headerColor,
+						width,
+						height,
+						fontSize
+					} = values(inputs);
+					result.innerHTML = '';
+					for (let board = 0; board < boards; board++) {
+						const b = document.createElement('table');
+						b.style.breakAfter = 'page';
+						if (width > 0) {
+							b.style.width = (width * columns) + 'px';
+						}
+						b.classList.add('table', 'table-bordered');
+						if (header.checked) {
+							console.log('on');
+							const thead = document.createElement('thead');
+							const tr = document.createElement('tr');
+							const th = document.createElement('th');
+							th.style.backgroundColor = headerColor;
+							th.setAttribute('colspan', columns);
+							if(centered.checked) {
+								th.classList.add('text-center');
+							}
+							if (width > 0) {
+								th.setAttribute('width', width);
+							}
+							if (height > 0) {
+								th.setAttribute('height', height);
+							}
+							if (fontSize > 0) {
+								th.style.fontSize = fontSize + 'px';
+							}
+							th.textContent = headerText;
+							tr.appendChild(th);
+							thead.appendChild(tr);
+							b.appendChild(thead);
+						}
+						const tbody = document.createElement('tbody');
+						b.appendChild(tbody);
+						for (let row = 0; row < rows; row++) {
+							const r = document.createElement('tr');
+							for (let column = 0; column < columns; column++) {
+								const c = document.createElement('td');
+								if(centered.checked) {
+									c.classList.add('text-center');
+								}
+								if (width > 0) {
+									c.setAttribute('width', width);
+								}
+								if (height > 0) {
+									c.setAttribute('height', height);
+								}
+								if (fontSize > 0) {
+									c.style.fontSize = fontSize + 'px';
+								}
+								c.textContent = Math.floor(Math.random() * maxNumber) + minNumber;
+								r.appendChild(c);
+							}
+							tbody.appendChild(r);
+						}
+						result.appendChild(b);
+					}
+				}));
+		</script>
+	</body>
+</html>
