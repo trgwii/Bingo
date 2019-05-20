@@ -24,6 +24,10 @@
 			<br />
 			<details>
 				<summary>Advanced settings</summary>
+				<label for="unique">Generate unique numbers per board?</label>
+				<input id="unique" type="checkbox" checked="checked" />
+				<span id="uniqueError" class="text-danger"></span>
+				<br />
 				<label for="header">Use header?</label>
 				<input id="header" type="checkbox" checked="checked" />
 				<br />
@@ -67,6 +71,7 @@
 				columns,
 				minNumber,
 				maxNumber,
+				unique,
 				header,
 				headerText,
 				headerColor,
@@ -123,6 +128,7 @@
 						}
 						const tbody = document.createElement('tbody');
 						b.appendChild(tbody);
+						const nums = new Set();
 						for (let row = 0; row < rows; row++) {
 							const r = document.createElement('tr');
 							for (let column = 0; column < columns; column++) {
@@ -139,7 +145,24 @@
 								if (fontSize > 0) {
 									c.style.fontSize = fontSize + 'px';
 								}
-								c.textContent = Math.floor(Math.random() * maxNumber) + minNumber;
+								if (
+									unique.checked &&
+									maxNumber - minNumber < rows * columns &&
+									(row < rows || column < columns)
+								) {
+									unique.checked = false;
+									uniqueError.textContent = 'Too few possible numbers to generate unique numbers!';
+									setTimeout(() => {
+										uniqueError.textContent = '';
+									}, 3000);
+
+								}
+								let num;
+								do {
+									num = Math.floor(Math.random() * maxNumber) + minNumber;
+								} while(unique.checked && nums.has(num) && nums.size < rows * columns);
+								nums.add(num);
+								c.textContent = num;
 								r.appendChild(c);
 							}
 							tbody.appendChild(r);
