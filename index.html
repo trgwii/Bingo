@@ -52,6 +52,8 @@
 				<label for="fontSize">Font size of each cell?</label>
 				<input id="fontSize" type="number" min="0" max="500" />
 				<br />
+				<label for="boardsPerPage">For printing: number of boards per page</label>
+				<input id="boardsPerPage" type="number" min="1" max="10" />
 			</details>
 		</div>
 		<div id="result"></div>
@@ -81,7 +83,8 @@
 				centered,
 				width,
 				height,
-				fontSize
+				fontSize,
+				boardsPerPage
 			};
 
 			const generate = () => {
@@ -95,12 +98,15 @@
 						headerColor,
 						width,
 						height,
-						fontSize
+						fontSize,
+						boardsPerPage
 					} = values(inputs);
 					result.innerHTML = '';
 					for (let board = 0; board < boards; board++) {
 						const b = document.createElement('table');
-						b.style.breakAfter = 'page';
+						if (board % boardsPerPage !== 0) {
+							b.style.breakAfter = 'page';
+						}
 						if (width > 0) {
 							b.style.width = (width * columns) + 'px';
 						}
@@ -182,6 +188,11 @@
 				};
 				Object.values(inputs).forEach(el =>
 					el.addEventListener('input', generate));
+
+				const s = new URLSearchParams(location.search);
+				[ ...s.entries() ]
+					.forEach(([ key, value ]) =>
+						inputs[key].value = value);
 				generate();
 		</script>
 	</body>
