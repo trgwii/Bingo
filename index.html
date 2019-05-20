@@ -28,6 +28,9 @@
 				<input id="unique" type="checkbox" checked="checked" />
 				<span id="uniqueError" class="text-danger"></span>
 				<br />
+				<label for="uniqueProgress">Amount of possible values used per board:</label>
+				<progress id="uniqueProgress" value="5" max="100"></progress>
+				<br />
 				<label for="header">Use header?</label>
 				<input id="header" type="checkbox" checked="checked" />
 				<br />
@@ -144,6 +147,13 @@
 								}
 								if (fontSize > 0) {
 									c.style.fontSize = fontSize + 'px';
+								}
+								if (unique.checked) {
+									uniqueProgress.value = rows * columns;
+									uniqueProgress.max = maxNumber - minNumber;
+								} else {
+									uniqueProgress.value = 0;
+									uniqueProgress.max = 1;
 								}
 								if (
 									unique.checked &&
